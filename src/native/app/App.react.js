@@ -9,15 +9,20 @@ import routes from '../routes';
 import styles from './styles';
 import start from '../../common/app/start';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { injectIntl, intlShape } from 'react-intl';
+import FBLogin from 'react-native-facebook-login';
+import { firebaseActions } from '../../common/lib/redux-firebase';
 
 const deviceScreen = Dimensions.get('window');
 
 class App extends Component {
 
   static propTypes = {
+    auth: PropTypes.object.isRequired,
     device: PropTypes.object.isRequired,
     intl: intlShape.isRequired,
+    nativeLogin: PropTypes.func.isRequired,
     onSideMenuChange: PropTypes.func.isRequired,
     toggleSideMenu: PropTypes.func.isRequired,
     ui: PropTypes.object.isRequired
@@ -33,6 +38,7 @@ class App extends Component {
     this.onRouteChange = this.onRouteChange.bind(this);
     this.onSideMenuChange = this.onSideMenuChange.bind(this);
     this.renderScene = this.renderScene.bind(this);
+    this.processLogin = this.processLogin.bind(this);
   }
 
   onNavigatorRef(component) {
@@ -62,6 +68,10 @@ class App extends Component {
     throw new Error('Route not found.');
   }
 
+  processLogin(data) {
+    this.props.nativeLogin(data.credentials.token);
+  }
+
   renderScene(route) {
     const { toggleSideMenu } = this.props;
     return (
@@ -75,7 +85,29 @@ class App extends Component {
     );
   }
 
-  render() {
+  renderLogin() {
+    return (
+      <View style={[styles.centeredView, { paddingBottom: 64 }]}>
+        <FBLogin style={{ marginBottom: 10, }}
+          permissions={['email', 'user_friends']}
+          onLogin={(data) => {
+            console.log('Logged in!');
+            this.processLogin(data);
+            console.log(data);
+          }}
+          onLogout={() => {
+            console.log("Logged out.");
+          }}
+          onLoginFound={(data) => {
+            console.log("Existing login found.");
+            this.processLogin(data);
+            console.log(data);
+          }}
+        />
+      </View>);
+  }
+
+  renderApp() {
     const { ui } = this.props;
 
     return (
@@ -100,13 +132,30 @@ class App extends Component {
     );
   }
 
+  render() {
+    const { auth } = this.props;
+
+    return auth.isLoggedIn ? this.renderApp() : this.renderLogin();
+  }
+
 }
 
 App = injectIntl(App);
 
+/*
 App = connect(state => ({
   device: state.device,
   ui: state.ui
-}), uiActions)(App);
+}), (dispatch) => ({
+  firebaseActions: bindActionCreators(firebaseActions, dispatch),
+  uiActions: bindActionCreators(uiActions, dispatch)
+}))(App);
+*/
+
+App = connect(state => ({
+  auth: state.auth,
+  device: state.device,
+  ui: state.ui
+}), Object.assign({}, firebaseActions, uiActions))(App);
 
 export default start(App);

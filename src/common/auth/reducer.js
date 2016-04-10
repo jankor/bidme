@@ -3,6 +3,7 @@ import { Record } from 'immutable';
 import { firebaseActions } from '../lib/redux-firebase';
 
 const InitialState = Record({
+  isLoggedIn: false,
   formDisabled: false,
   formError: null
 });
@@ -30,7 +31,7 @@ export default function authReducer(state = initialState, action) {
     case firebaseActions.REDUX_FIREBASE_LOGIN_SUCCESS:
     case firebaseActions.REDUX_FIREBASE_RESET_PASSWORD_SUCCESS:
     case firebaseActions.REDUX_FIREBASE_SIGN_UP_SUCCESS:
-      return state.merge({ formDisabled: false, formError: null });
+      return state.set('isLoggedIn', true);
 
   }
 

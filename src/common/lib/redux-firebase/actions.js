@@ -33,6 +33,14 @@ async function socialLogin(firebase, provider) {
   }
 }
 
+async function nativeAuthWithToken(firebase, provider, token) {
+  try {
+    await firebase.authWithOAuthToken(provider, token);
+  } catch (error) {
+    throw error;
+  }
+}
+
 function saveUserOnAuth(authData) {
   return ({ firebase }) => {
     const user = mapAuthToUser(authData);
@@ -57,6 +65,17 @@ export function login(provider, fields) {
     const promise = provider === 'password'
       ? firebase.authWithPassword(fields)
       : socialLogin(firebase, provider);
+    return {
+      type: 'REDUX_FIREBASE_LOGIN',
+      payload: { promise }
+    };
+  };
+}
+
+export function nativeLogin(token) {
+  return ({ firebase }) => {
+    console.log('asi');
+    const promise = nativeAuthWithToken(firebase, 'facebook', token);
     return {
       type: 'REDUX_FIREBASE_LOGIN',
       payload: { promise }

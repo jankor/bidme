@@ -17,6 +17,15 @@ const messages = defineMessages({
 export default class Page extends Component {
 
   render() {
+    console.log('home');
+    navigator.geolocation.getCurrentPosition(
+     (position) => {
+       console.log('position');
+       console.log(position);
+     },
+     (error) => console.log(error.message),
+     { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+   );
     return (
       <View style={[appStyles.centeredView, { paddingBottom: 64 }]}>
         <Text style={[appStyles.centered, appStyles.paragraph]}>
