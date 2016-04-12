@@ -24,5 +24,9 @@ export default defineMessages({
   todos: {
     defaultMessage: 'Todos',
     id: 'app.links.todos'
+  },
+  messages: {
+    defaultMessage: 'Messages',
+    id: 'app.links.messages'
   }
 });

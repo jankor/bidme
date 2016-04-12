@@ -9,7 +9,6 @@ import routes from '../routes';
 import styles from './styles';
 import start from '../../common/app/start';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { injectIntl, intlShape } from 'react-intl';
 import FBLogin from 'react-native-facebook-login';
 import { firebaseActions } from '../../common/lib/redux-firebase';
@@ -64,6 +63,7 @@ class App extends Component {
       case routes.home: return intl.formatMessage(linksMessages.home);
       case routes.intl: return intl.formatMessage(linksMessages.intl);
       case routes.todos: return intl.formatMessage(linksMessages.todos);
+      case routes.messages: return intl.formatMessage(linksMessages.messages);
     }
     throw new Error('Route not found.');
   }
@@ -79,6 +79,7 @@ class App extends Component {
         <Header
           title={this.getTitle(route)}
           toggleSideMenu={toggleSideMenu}
+          onRouteChange={this.onRouteChange}
         />
         <route.Page />
       </View>
